@@ -6,6 +6,7 @@ PRODUCT="JBoss BPM Suite"
 DOCKERFILE="support/docker/Dockerfile"
 SRC_DIR=./installs
 BPMS=jboss-bpmsuite-6.4.0.GA-deployable-eap7.x.zip
+BPMS_PATCH=jboss-bpmsuite-6.4.4-patch.zip
 EAP=jboss-eap-7.0.0-installer.jar
 VERSION=6.4
 
@@ -59,6 +60,16 @@ if [ -r $SRC_DIR/$BPMS ] || [ -L $SRC_DIR/$BPMS ]; then
 		echo
 else
 		echo Need to download $BPMS package from the Customer Portal
+		echo and place it in the $SRC_DIR directory to proceed...
+		echo
+		exit
+fi
+
+if [ -r $SRC_DIR/$BPMS_PATCH ] || [ -L $SRC_DIR/$BPMS_PATCH ]; then
+		echo Product sources are present...
+		echo
+else
+		echo Need to download $BPMS_PATCH package from the Customer Portal
 		echo and place it in the $SRC_DIR directory to proceed...
 		echo
 		exit
