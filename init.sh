@@ -12,6 +12,9 @@ SRC_DIR=./installs
 SUPPORT_DIR=./support
 PRJ_DIR=./projects
 BPMS=jboss-bpmsuite-6.4.0.GA-deployable-eap7.x.zip
+BPMS_PATCH_FOLDER=jboss-bpmsuite-6.4.4-patch
+BPMS_PATCH=$BPMS_PATCH_FOLDER.zip
+PATCH_DIR=$TARGET/$BPMS_PATCH_FOLDER
 EAP=jboss-eap-7.0.0-installer.jar
 #EAP_PATCH=jboss-eap-6.4.4-patch.zip
 VERSION=6.4
@@ -72,6 +75,16 @@ else
 		exit
 fi
 
+if [ -r $SRC_DIR/$BPMS_PATCH ] || [ -L $SRC_DIR/$BPMS_PATCH ]; then
+		echo Product sources are present...
+		echo
+else
+		echo Need to download $BPMS_PATCH package from the Customer Portal
+		echo and place it in the $SRC_DIR directory to proceed...
+		echo
+		exit
+fi
+
 # Remove the old JBoss instance, if it exists.
 if [ -x $JBOSS_HOME ]; then
 		echo "  - removing existing JBoss product..."
@@ -106,6 +119,25 @@ echo "Deploying JBoss BPM Suite now..."
 echo
 unzip -qo $SRC_DIR/$BPMS -d $TARGET
 #java -jar $SRC_DIR/$BPMS $SUPPORT_DIR/installation-bpms -variablefile $SUPPORT_DIR/installation-bpms.variables
+if [ $? -ne 0 ]; then
+	echo
+	echo Error occurred during $PRODUCT installation!
+	exit
+fi
+
+echo
+echo "Instaling JBoss BPM Suite patch..."
+echo
+unzip -q $SRC_DIR/$BPMS_PATCH -d $TARGET
+if [ $? -ne 0 ]; then
+	echo
+	echo Error occurred during $PRODUCT installation!
+	exit
+fi
+
+cd $BPMS_PATCH_FOLDER \
+	&& ./apply-updates.sh $BPMS_HOME eap7.x \
+	&& cd - &> /dev/null
 if [ $? -ne 0 ]; then
 	echo
 	echo Error occurred during $PRODUCT installation!
